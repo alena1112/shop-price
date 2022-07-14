@@ -13,3 +13,8 @@ logging:
     org.springframework.jdbc.core.JdbcTemplate: TRACE
 server:
   port: 8080
+
+shop-price:
+  jewelry-shop:
+    address: https://mygracefuljewelry.com/shop
+    all-jewelry-url: /api/jewelry/all

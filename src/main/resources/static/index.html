@@ -2,6 +2,7 @@
 <head>
     <script>
         getAllMaterials(true);
+        loadJewelries();
         fetch("http://localhost:8080/shop").then(function (response) {
             response.text().then(function (text) {
                 let json = JSON.parse(text);
@@ -248,6 +249,41 @@
             let materialDialog = document.getElementById('materialDialog');
             materialDialog.close();
         }
+
+        function loadJewelries() {
+            fetch("http://localhost:8080/jewelry/all")
+                .then(function (response) {
+                    response.text().then(function (text) {
+                        let jewelries = JSON.parse(text);
+                        let jewelryList = document.getElementById("jewelryList");
+                        for (let i = 0; i < jewelries.length; i++) {
+                            let optionElement = document.createElement("option");
+                            optionElement.value = jewelries[i].id;
+                            optionElement.innerHTML = jewelries[i].name + " - " + jewelries[i].description;
+                            jewelryList.appendChild(optionElement);
+                        }
+                    })
+                });
+        }
+
+        function showJewelry() {
+            let jewelryList = document.getElementById("jewelryList");
+            let jewelryImg = document.getElementById("jewelryImg");
+            let marketPrice = document.getElementById("marketPrice");
+            if (jewelryList.value) {
+                fetch("http://localhost:8080/jewelry/" + jewelryList.value)
+                    .then(function (response) {
+                        response.text().then(function (text) {
+                            let json = JSON.parse(text);
+                            jewelryImg.src = json.imageUrl;
+                            marketPrice.innerHTML = json.price;
+                        })
+                    });
+            } else {
+                jewelryImg.src = "";
+                marketPrice.innerHTML = "";
+            }
+        }
     </script>
 
     <title>Shop Price Service</title>
@@ -288,6 +324,15 @@
 <button onclick="createMaterial()">Create Material</button>
 
 <h4>Jewelry</h4>
+<select id="jewelryList" onchange="showJewelry()">
+    <option></option>
+</select>
+</br></br>
+<img id="jewelryImg" style="width: 150px; height: 150px">
+<br/></br>
+<label>Market Price:</label>
+<label id="marketPrice"></label>
+<br/>
 <table id="jewelryMaterials">
     <thead>
     </thead>

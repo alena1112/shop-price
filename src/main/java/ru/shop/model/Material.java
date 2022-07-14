@@ -2,6 +2,7 @@ package ru.shop.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import ru.shop.service.PriceHelper;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
@@ -32,6 +33,6 @@ public class Material extends IdentifiableEntity {
 
     @Transient
     public Double getUnitPriceWithDelivery() {
-        return (price + delivery) / number;
+        return PriceHelper.round((price + delivery) / number);
     }
 }

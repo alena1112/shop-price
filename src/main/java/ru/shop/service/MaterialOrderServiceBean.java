@@ -92,7 +92,7 @@ public class MaterialOrderServiceBean implements MaterialOrderService {
         int numOfItems = order.getMaterials().size();
         double delivery = order.getDeliveryPrice() / numOfItems;
         for (Material item : order.getMaterials()) {
-            item.setDelivery(delivery);
+            item.setDelivery(PriceHelper.round(delivery));
         }
     }
 }

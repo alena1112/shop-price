@@ -60,6 +60,7 @@ public class MaterialServiceBean implements MaterialService {
                 price += material.get().getUnitPriceWithDelivery() * Integer.parseInt(dto.getCount());
             }
         }
+        price = PriceHelper.round(price);
         log.info("Calculated original price - {}", price);
         return price;
     }
