@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5430/shopPriceDB
+    username: usr
+    password: pwd
+  flyway:
+    enabled: true
+  jpa:
+    show-sql: false
+
+logging:
+  level:
+    org.springframework.jdbc.core.JdbcTemplate: TRACE
+server:
+  port: 8080

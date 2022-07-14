@@ -1,0 +1,37 @@
+package ru.shop.model;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.*;
+import javax.persistence.Entity;
+
+@Entity
+@Table(name = "material")
+@Getter
+@Setter
+public class Material extends IdentifiableEntity {
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "price")
+    private Double price;
+
+    @Column(name = "delivery")
+    private Double delivery;
+
+    @Column(name = "number")
+    private Integer number;
+
+    @Column(name = "image_url")
+    private String imageURL;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "material_order_id")
+    private MaterialOrder order;
+
+    @Transient
+    public Double getUnitPriceWithDelivery() {
+        return (price + delivery) / number;
+    }
+}
