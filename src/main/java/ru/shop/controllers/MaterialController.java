@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
+import ru.shop.SPException;
 import ru.shop.controllers.dto.JewelryMaterialsDto;
 import ru.shop.controllers.dto.MaterialDto;
 import ru.shop.controllers.dto.PageDto;
@@ -28,70 +29,60 @@ public class MaterialController {
     private final MaterialOrderService materialOrderService;
 
     @GetMapping
-    public List<MaterialDto> getAllMaterials(@RequestParam(value = "shop", required = false) Shop shop,
-                                             @RequestParam(value = "order", required = false) String order,
-                                             @RequestParam(value = "material", required = false) String materialName) {
+    public RestResponse<List<MaterialDto>> getAllMaterials(@RequestParam(value = "shop", required = false) Shop shop,
+                                                           @RequestParam(value = "order", required = false) String order,
+                                                           @RequestParam(value = "material", required = false) String materialName) {
         log.info("request to get all materials, shop {}, order {}, material {}", shop, order, materialName);
-        return materialService.getAllMaterials(
-                        shop == null,//TODO удалить параметр и сделать нормальный кеш
-                        shop,
-                        StringUtils.defaultIfBlank(order, null),
-                        StringUtils.defaultIfBlank(materialName, null))
-                .stream()
-                .map(MaterialDto::toMaterialDto)
-                .collect(Collectors.toList());
+        return RestResponse.withData(
+                materialService.getAllMaterials(
+                                shop == null,//TODO удалить параметр и сделать нормальный кеш
+                                shop,
+                                StringUtils.defaultIfBlank(order, null),
+                                StringUtils.defaultIfBlank(materialName, null))
+                        .stream()
+                        .map(MaterialDto::toMaterialDto)
+                        .collect(Collectors.toList()));
     }
 
     @PostMapping
-    public String saveMaterial(@RequestBody MaterialDto materialDto) {
+    public RestResponse<?> saveMaterial(@RequestBody MaterialDto materialDto) {
         log.info("request to save material");
         materialService.saveMaterial(materialDto);
-        return "OK";
+        return RestResponse.ok();
     }
 
     @GetMapping("/{id}")
-    public MaterialDto getMaterial(@PathVariable("id") String materialId) {
+    public RestResponse<MaterialDto> getMaterial(@PathVariable("id") String materialId) {
         log.info("request to get a material by id {}", materialId);
-        return materialService.getMaterialById(Long.parseLong(materialId)).map(MaterialDto::toMaterialDto).orElse(null);
+        return RestResponse.withData(
+                materialService.getMaterialById(Long.parseLong(materialId)).map(MaterialDto::toMaterialDto).orElse(null));
     }
 
     @PostMapping(value = "/load")
-    public String loadMaterials() {
+    public RestResponse<?> loadMaterials() {
         log.info("request to start loading materials");
         materialOrderService.loadMaterials();
-        return "OK";
+        return RestResponse.ok();
     }
 
     @PostMapping(value = "/loadPage")
-    public String loadPageMaterials(@RequestBody PageDto pageDto) {
+    public RestResponse<?> loadPageMaterials(@RequestBody PageDto pageDto) {
         log.info("request to start loading page materials");
-        checkNotNull(pageDto.getShop());
-        checkNotEmpty(pageDto.getText());
+        SPException.checkNotNull(pageDto.getShop(), "Shop is null!");
+        SPException.checkNotEmpty(pageDto.getText(), "Page text is null!");
         materialOrderService.loadMaterials(pageDto.getShop(), pageDto.getText());
-        return "OK";
+        return RestResponse.ok();
     }
 
     @GetMapping("/orders")
-    public List<String> getOrders(@RequestParam(value = "shop", required = false) Shop shop) {
+    public RestResponse<List<String>> getOrders(@RequestParam(value = "shop", required = false) Shop shop) {
         log.info("request to get all material orders");
-        return materialOrderService.getOrders(shop);
+        return RestResponse.withData(materialOrderService.getOrders(shop));
     }
 
     @PostMapping(value = "/calculate")
-    public Double calculatePrice(@RequestBody JewelryMaterialsDto jewelryMaterialsDto) {
+    public RestResponse<Double> calculatePrice(@RequestBody JewelryMaterialsDto jewelryMaterialsDto) {
         log.info("request to start calculating price");
-        return materialService.calculatePrice(jewelryMaterialsDto);
-    }
-
-    private static void checkNotEmpty(String str) {//TODO create exception class and handler
-        if (str == null || str.isEmpty()) {
-            throw new NullPointerException();
-        }
-    }
-
-    private static void checkNotNull(Object obj) {
-        if (obj == null) {
-            throw new NullPointerException();
-        }
+        return RestResponse.withData(materialService.calculatePrice(jewelryMaterialsDto));
     }
 }

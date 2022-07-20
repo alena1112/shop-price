@@ -1,11 +1,22 @@
 package ru.shop.controllers.dto;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
-@RequiredArgsConstructor
+@Setter
+@NoArgsConstructor
 public class JewelryMaterialDto {
-    private final String materialId;
-    private final String count;
+    private Long id;
+    private Integer count;
+    private String imageURL;
+    private String name;
+
+    public JewelryMaterialDto(Long id, Integer count, String imageURL, String name) {
+        this.id = id;
+        this.count = count;
+        this.imageURL = imageURL;
+        this.name = name;
+    }
 }

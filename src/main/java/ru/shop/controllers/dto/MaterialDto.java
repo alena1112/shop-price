@@ -8,23 +8,23 @@ import ru.shop.model.Material;
 @NoArgsConstructor
 @Builder
 public class MaterialDto {
-    private String id;
+    private Long id;
     private String shop;
     private String name;
-    private String price;
-    private String unitPriceWithDelivery;
-    private String number;
+    private Double price;
+    private Double unitPriceWithDelivery;
+    private Integer number;
     private String imageURL;
 
     public static MaterialDto toMaterialDto(Material material) {
         return MaterialDto.builder()
-                .id(String.valueOf(material.getId()))
+                .id(material.getId())
                 .shop(String.valueOf(material.getOrder().getShop().getId()))
                 .imageURL(material.getImageURL())
                 .name(material.getName())
-                .number(String.valueOf(material.getNumber()))
-                .price(String.valueOf(material.getPrice()))
-                .unitPriceWithDelivery(String.valueOf(material.getUnitPriceWithDelivery()))
+                .number(material.getNumber())
+                .price(material.getPrice())
+                .unitPriceWithDelivery(material.getUnitPriceWithDelivery())
                 .build();
     }
 }

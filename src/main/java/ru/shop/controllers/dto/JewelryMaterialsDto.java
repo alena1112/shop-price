@@ -1,14 +1,12 @@
 package ru.shop.controllers.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
-@Setter
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class JewelryMaterialsDto {
-    private List<JewelryMaterialDto> materials;
+    private final Long jewelryId;
+    private final List<JewelryMaterialDto> materials;
 }

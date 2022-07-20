@@ -55,9 +55,9 @@ public class MaterialServiceBean implements MaterialService {
         double price = 0;
         for (JewelryMaterialDto dto : jewelryMaterialsDto.getMaterials()) {
             Optional<Material> material = getAllMaterials().stream().filter(m ->
-                    m.getId().equals(Long.parseLong(dto.getMaterialId()))).findFirst();
+                    m.getId().equals(dto.getId())).findFirst();
             if (material.isPresent()) {
-                price += material.get().getUnitPriceWithDelivery() * Integer.parseInt(dto.getCount());
+                price += material.get().getUnitPriceWithDelivery() * dto.getCount();
             }
         }
         price = PriceHelper.round(price);
@@ -67,15 +67,15 @@ public class MaterialServiceBean implements MaterialService {
 
     @Override
     public void saveMaterial(MaterialDto materialDto) {
-        Material material = materialDto.getId() != null ? getMaterialById(Long.parseLong(materialDto.getId())).orElse(null) : null;
+        Material material = materialDto.getId() != null ? getMaterialById(materialDto.getId()).orElse(null) : null;
         if (material == null) {
             material = new Material();
             material.setImageURL(materialDto.getImageURL());
             material.setName(materialDto.getName());
-            material.setPrice(Double.parseDouble(materialDto.getPrice()));
+            material.setPrice(materialDto.getPrice());
             material.setDelivery(0.0);
         }
-        material.setNumber(Integer.parseInt(materialDto.getNumber()));
+        material.setNumber(materialDto.getNumber());
         materialDao.save(material);
         log.info("save material, id: {}, {}", material.getId(), material.getName());
     }

@@ -1,7 +1,23 @@
+function loadMessage(response, message) {
+    let text = JSON.parse(response);
+    let element = document.getElementById("infoMessage");
+    element.innerHTML = "Response from server: "
+    if (text.error) {
+        element.innerHTML += text.error;
+        element.style.color = 'red';
+    } else if (message) {
+        element.innerHTML += message;
+        element.style.color = 'green';
+    } else {
+        element.innerHTML += text.data;
+        element.style.color = 'green';
+    }
+}
+
 function loadShops() {
     fetch("http://localhost:8080/shop").then(function (response) {
         response.text().then(function (text) {
-            let json = JSON.parse(text);
+            let json = JSON.parse(text).data;
             let selectForLoading = document.getElementById("shopSelect");
             let selectForFiltering = document.getElementById("shopFilter");
             addShopOptionsInSelect(selectForLoading, json);
@@ -36,7 +52,7 @@ function getOrders() {
     fetch("http://localhost:8080/material/orders" + shopParam)
         .then(function (response) {
             response.text().then(function (text) {
-                let json = JSON.parse(text);
+                let json = JSON.parse(text).data;
                 let orderFilter = document.getElementById("materialOrderFilter");
                 while (orderFilter.hasChildNodes()) {
                     orderFilter.removeChild(orderFilter.lastChild);
@@ -56,12 +72,9 @@ function getOrders() {
 }
 
 function render(value) {
-    let json = JSON.parse(value);
+    let json = JSON.parse(value).data;
     let table = document.getElementById("materialsBody");
-
-    while (table.hasChildNodes()) {
-        table.removeChild(table.lastChild);
-    }
+    clearTable("materialsBody")
 
     for (let i = 0; i < json.length; i++) {
         let material = json[i];
@@ -112,40 +125,43 @@ function render(value) {
             fetch("http://localhost:8080/material/" + this.value)
                 .then(function (response) {
                     response.text().then(function (text) {
-                        let material = JSON.parse(text);
-                        let jewelryTable = document.getElementById("jewelryMaterials");
-                        let jewelryRow = jewelryTable.insertRow();
-                        jewelryRow.id = material.id
-
-                        let img = document.createElement("img");
-                        img.src = material.imageURL;
-                        jewelryRow.insertCell().appendChild(img);
-
-                        jewelryRow.insertCell().appendChild(document.createTextNode(material.name));
-
-                        let inputCount = document.createElement("input");
-                        inputCount.type = "text";
-                        inputCount.value = "1";
-                        inputCount.onchange = function () {
-                            updateOriginalPrice();
-                        }
-                        jewelryRow.insertCell().appendChild(inputCount);
-
-                        let deleteButton = document.createElement("button");
-                        deleteButton.innerHTML = "Delete";
-                        deleteButton.onclick = function () {
-                            let p = this.parentNode.parentNode;
-                            p.parentNode.removeChild(p);
-                            updateOriginalPrice();
-                        }
-                        jewelryRow.insertCell().appendChild(deleteButton);
-
+                        let material = JSON.parse(text).data;
+                        addMaterialInJewelryMaterialsTable(material, "1")
                         updateOriginalPrice();
                     })
                 });
         }
         newRow.insertCell().appendChild(addButton);
     }
+}
+
+function addMaterialInJewelryMaterialsTable(material, count) {
+    let jewelryTable = document.getElementById("jewelryMaterials");
+    let jewelryRow = jewelryTable.insertRow();
+    jewelryRow.id = material.id
+
+    let img = document.createElement("img");
+    img.src = material.imageURL;
+    jewelryRow.insertCell().appendChild(img);
+
+    jewelryRow.insertCell().appendChild(document.createTextNode(material.name));
+
+    let inputCount = document.createElement("input");
+    inputCount.type = "text";
+    inputCount.value = count;
+    inputCount.onchange = function () {
+        updateOriginalPrice();
+    }
+    jewelryRow.insertCell().appendChild(inputCount);
+
+    let deleteButton = document.createElement("button");
+    deleteButton.innerHTML = "Delete";
+    deleteButton.onclick = function () {
+        let p = this.parentNode.parentNode;
+        p.parentNode.removeChild(p);
+        updateOriginalPrice();
+    }
+    jewelryRow.insertCell().appendChild(deleteButton);
 }
 
 function loadMaterials() {
@@ -191,17 +207,7 @@ function addShopOptionsInSelect(select, shops) {
 }
 
 function updateOriginalPrice() {
-    let materialsTable = document.getElementById('jewelryMaterials');
-    let rows = materialsTable.rows;
-    let array = [];
-
-    for (let i = 0; i < rows.length; i++) {
-        let obj = {};
-        obj.materialId = rows[i].id;
-        obj.count = rows[i].children[2].children[0].value;
-        array.push(obj);
-    }
-
+    let array = readMaterialsTable();
     let price = document.getElementById('originalPrice');
     if (array.length > 0) {
         fetch('http://localhost:8080/material/calculate', {
@@ -212,7 +218,7 @@ function updateOriginalPrice() {
             })
         }).then(function (response) {
             response.text().then(function (text) {
-                price.innerHTML = text;
+                price.innerHTML = JSON.parse(text).data;
             });
         });
     } else {
@@ -250,7 +256,8 @@ function loadJewelries() {
     fetch("http://localhost:8080/jewelry/all")
         .then(function (response) {
             response.text().then(function (text) {
-                let jewelries = JSON.parse(text);
+                loadMessage(text, "Jewelry loaded successfully")
+                let jewelries = JSON.parse(text).data;
                 let jewelryList = document.getElementById("jewelryList");
                 for (let i = 0; i < jewelries.length; i++) {
                     let optionElement = document.createElement("option");
@@ -270,13 +277,63 @@ function showJewelry() {
         fetch("http://localhost:8080/jewelry/" + jewelryList.value)
             .then(function (response) {
                 response.text().then(function (text) {
-                    let json = JSON.parse(text);
+                    let json = JSON.parse(text).data;
                     jewelryImg.src = json.imageUrl;
                     marketPrice.innerHTML = json.price;
+
+                    clearTable("jewelryMaterials");
+
+                    for (let i = 0; i < json.materials.length; i++) {
+                        let material = json.materials[i];
+                        addMaterialInJewelryMaterialsTable(material, material.count)
+                    }
+                    updateOriginalPrice();
                 })
             });
     } else {
-        jewelryImg.src = "";
+        jewelryImg.src = "no_image.png";
         marketPrice.innerHTML = "";
+        clearTable("jewelryMaterials");
+        let originalPrice = document.getElementById('originalPrice');
+        originalPrice.innerHTML = "";
     }
+}
+
+function clearTable(tableName) {
+    let table = document.getElementById(tableName);
+    while (table.hasChildNodes()) {
+        table.removeChild(table.lastChild);
+    }
+}
+
+function saveJewelry() {
+    let jewelryId = document.getElementById("jewelryList").value;
+    let array = readMaterialsTable();
+    if (jewelryId) {
+        fetch('http://localhost:8080/jewelry', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                jewelryId: jewelryId,
+                materials: array
+            })
+        }).then(function (response) {
+            response.text().then(function (text) {
+                loadMessage(text, "Materials saved successfully")
+            });
+        });
+    }
+}
+
+function readMaterialsTable() {
+    let materialsTable = document.getElementById('jewelryMaterials');
+    let rows = materialsTable.rows;
+    let array = [];
+    for (let i = 0; i < rows.length; i++) {
+        let obj = {};
+        obj.id = rows[i].id;
+        obj.count = rows[i].children[2].children[0].value;
+        array.push(obj);
+    }
+    return array;
 }

@@ -1,6 +1,7 @@
 package ru.shop.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.shop.service.PriceHelper;
 
@@ -11,6 +12,7 @@ import javax.persistence.Entity;
 @Table(name = "material")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Material extends IdentifiableEntity {
     @Column(name = "name")
     private String name;
@@ -30,6 +32,10 @@ public class Material extends IdentifiableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "material_order_id")
     private MaterialOrder order;
+
+    public Material(Long id) {
+        this.id = id;
+    }
 
     @Transient
     public Double getUnitPriceWithDelivery() {

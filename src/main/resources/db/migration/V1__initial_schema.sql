@@ -21,9 +21,9 @@ create table material
 
 create table jewelry_material
 (
-    id          bigserial not null primary key,
     jewelry_id  bigserial not null,
     material_id bigserial not null,
     number      int       not null,
+    PRIMARY KEY (jewelry_id, material_id),
     FOREIGN KEY (material_id) REFERENCES material (id)
 );
