@@ -1,5 +1,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" content="text/html;">
 <head>
+    <style>
+        th, td {
+            border-style: dotted;
+        }
+    </style>
     <script src="./scripts.js"></script>
     <script>
         getAllMaterials(true);
@@ -8,9 +13,8 @@
     </script>
 
     <title>Shop Price Service</title>
-    </br>
+
     <label id="infoMessage"></label>
-    </br>
 </head>
 <body>
 
@@ -35,16 +39,18 @@
     <button type="submit" onclick="saveMaterial()">Save</button>
 </dialog>
 
-<div class="top">
-    <h3>Welcome to the service page!</h3>
-</div>
+<dialog id="orderPageDialog">
+    <textarea id="pageTextArea" rows="4" cols="50"></textarea>
+    </br>
+    <select id="shopSelect"></select>
+    </br></br>
+    <button type="reset" onclick="closeOrderPageDialog()">Cancel</button>
+    <button type="submit" onclick="loadOrderPage()">Save</button>
+</dialog>
 
-<textarea id="pageTextArea" rows="4" cols="50"></textarea>
-</br>
-<select id="shopSelect"></select>
-<button onclick="loadOrderPage()">Load Order Page</button>
 </br></br>
 <button onclick="loadMaterials()">PreLoad</button>
+<button onclick="openOrderPageDialog()">Load Order Page</button>
 <button onclick="createMaterial()">Create Material</button>
 
 <h4>Jewelry</h4>

@@ -252,6 +252,16 @@ function closeMaterialDialog() {
     materialDialog.close();
 }
 
+function openOrderPageDialog() {
+    let orderPageDialog = document.getElementById('orderPageDialog');
+    orderPageDialog.showModal();
+}
+
+function closeOrderPageDialog() {
+    let orderPageDialog = document.getElementById('orderPageDialog');
+    orderPageDialog.close();
+}
+
 function loadJewelries() {
     fetch("http://localhost:8080/jewelry/all")
         .then(function (response) {
