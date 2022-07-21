@@ -20,7 +20,6 @@ allprojects {
             imports {
                 mavenBom("org.springframework.boot:spring-boot-dependencies:2.5.2")
             }
-            dependency("com.google.guava:guava:${Versions.guava}")
             dependency("org.testcontainers:junit-jupiter:${Versions.testcontainers}")
             dependency("org.testcontainers:postgresql:${Versions.testcontainers}")
         }
@@ -39,6 +38,7 @@ dependencies {
 
     implementation("org.jsoup:jsoup:${Versions.jsoup}")
     implementation("org.apache.commons:commons-lang3")
+    implementation("com.google.guava:guava:${Versions.guava}")
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'

@@ -35,7 +35,6 @@ public class MaterialController {
         log.info("request to get all materials, shop {}, order {}, material {}", shop, order, materialName);
         return RestResponse.withData(
                 materialService.getAllMaterials(
-                                shop == null,//TODO удалить параметр и сделать нормальный кеш
                                 shop,
                                 StringUtils.defaultIfBlank(order, null),
                                 StringUtils.defaultIfBlank(materialName, null))

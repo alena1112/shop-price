@@ -1,5 +1,8 @@
 package ru.shop.service;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,12 +14,14 @@ import ru.shop.model.MaterialOrder;
 import ru.shop.model.Shop;
 import ru.shop.service.parser.HtmlShopReaderService;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +34,24 @@ public class MaterialOrderServiceBean implements MaterialOrderService {
     private final HtmlShopReaderService pandahallParser;
     private final HtmlShopReaderService stilnayaParser;
     private final HtmlShopReaderService luxfurnituraParser;
+
+    private LoadingCache<Shop, List<String>> MATERIAL_ORDERS_CACHE;
+
+    @PostConstruct
+    public void initCache() {
+        MATERIAL_ORDERS_CACHE = CacheBuilder
+                .newBuilder()
+                .expireAfterWrite(60, TimeUnit.SECONDS)
+                .maximumSize(10000)
+                .build(new CacheLoader<>() {
+                    @Override
+                    public List<String> load(Shop key) {
+                        List<String> orderNames = materialOrderDao.getAllOrderNames(key);
+                        log.info("load material order names {} to cache", String.join("; ", orderNames));
+                        return orderNames;
+                    }
+                });
+    }
 
     @Override
     public void loadMaterials() {
@@ -58,6 +81,7 @@ public class MaterialOrderServiceBean implements MaterialOrderService {
             }
         });
         materialOrderDao.saveAll(materialOrders);
+        refreshAllCache();
         log.info("load material orders count: {}", materialOrders.size());
     }
 
@@ -67,13 +91,14 @@ public class MaterialOrderServiceBean implements MaterialOrderService {
         order.ifPresent(o -> {
             calculatePriceForEachMaterial(o);
             materialOrderDao.save(o);
+            refreshCache(o.getShop());
             log.info("load material order page {}", o.getName());
         });
     }
 
     @Override
     public List<String> getOrders(Shop shop) {
-        List<String> orderNames = materialOrderDao.getAllOrderNames(shop);//TODO закешировать
+        List<String> orderNames = getOrdersFromCache(shop);
         log.info("load material order names {}", String.join("; ", orderNames));
         return orderNames;
     }
@@ -94,5 +119,25 @@ public class MaterialOrderServiceBean implements MaterialOrderService {
         for (Material item : order.getMaterials()) {
             item.setDelivery(PriceHelper.round(delivery));
         }
+    }
+
+    private List<String> getOrdersFromCache(Shop shop) {
+        if (shop == null) {
+            List<String> result = new ArrayList<>();
+            for(Shop s: Shop.values()) {
+                result.addAll(MATERIAL_ORDERS_CACHE.getUnchecked(s));
+            }
+            return result;
+        }
+        return MATERIAL_ORDERS_CACHE.getUnchecked(shop);
+    }
+
+    private void refreshCache(Shop shop) {
+        MATERIAL_ORDERS_CACHE.invalidate(shop);
+        MATERIAL_ORDERS_CACHE.refresh(shop);
+    }
+
+    private void refreshAllCache() {
+        Arrays.stream(Shop.values()).forEach(shop -> MATERIAL_ORDERS_CACHE.refresh(shop));
     }
 }

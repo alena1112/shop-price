@@ -12,6 +12,6 @@ public interface MaterialOrderDao extends JpaRepository<MaterialOrder, Long> {
 
     boolean existsMaterialOrderByName(String name);
 
-    @Query("select mo.name from MaterialOrder mo where :shop is null or mo.shop = :shop")
+    @Query("select mo.name from MaterialOrder mo where mo.shop = :shop")
     List<String> getAllOrderNames(@Param("shop") Shop shop);
 }

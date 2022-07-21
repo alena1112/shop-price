@@ -1,6 +1,8 @@
 package ru.shop.service;
 
-import lombok.RequiredArgsConstructor;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -12,29 +14,40 @@ import ru.shop.dao.MaterialDao;
 import ru.shop.model.Material;
 import ru.shop.model.Shop;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
 public class MaterialServiceBean implements MaterialService {
     private static final Logger log = LoggerFactory.getLogger(MaterialServiceBean.class);
 
     private final MaterialDao materialDao;
 
-    private List<Material> allMaterials = new ArrayList<>();
+    private final LoadingCache<String, List<Material>> MATERIALS_CACHE;
+
+    public MaterialServiceBean(MaterialDao materialDao) {
+        this.materialDao = materialDao;
+
+        MATERIALS_CACHE = CacheBuilder
+                .newBuilder()
+                .expireAfterWrite(60, TimeUnit.SECONDS)
+                .maximumSize(10000)
+                .build(new CacheLoader<>() {
+                    @Override
+                    public List<Material> load(String key) {
+                        List<Material> allMaterials = materialDao.findAll();
+                        log.info("load all materials to cache, count: {}", allMaterials.size());
+                        return allMaterials;
+                    }
+                });
+    }
 
     @Override
-    public List<Material> getAllMaterials(boolean isReload, Shop shop, String materialOrderName, String materialName) {
-        if (isReload) {
-            allMaterials = materialDao.findAll();
-            log.info("load all materials, count: {}", allMaterials.size());
-        }
-
-        List<Material> filteredMaterials = allMaterials.stream()
+    public List<Material> getAllMaterials(Shop shop, String materialOrderName, String materialName) {
+        List<Material> filteredMaterials = getMaterialsFromCache().stream()
                 .filter(m -> shop == null || m.getOrder().getShop() == shop)
                 .filter(m -> materialOrderName == null || m.getOrder().getName().equals(materialOrderName))
                 .filter(m -> materialName == null || m.getName().toLowerCase().contains(materialName.toLowerCase()))
@@ -47,14 +60,14 @@ public class MaterialServiceBean implements MaterialService {
 
     @Override
     public Optional<Material> getMaterialById(Long id) {
-        return getAllMaterials().stream().filter(m -> m.getId().equals(id)).findFirst();
+        return getMaterialsFromCache().stream().filter(m -> m.getId().equals(id)).findFirst();
     }
 
     @Override
     public double calculatePrice(JewelryMaterialsDto jewelryMaterialsDto) {
         double price = 0;
         for (JewelryMaterialDto dto : jewelryMaterialsDto.getMaterials()) {
-            Optional<Material> material = getAllMaterials().stream().filter(m ->
+            Optional<Material> material = getMaterialsFromCache().stream().filter(m ->
                     m.getId().equals(dto.getId())).findFirst();
             if (material.isPresent()) {
                 price += material.get().getUnitPriceWithDelivery() * dto.getCount();
@@ -77,14 +90,15 @@ public class MaterialServiceBean implements MaterialService {
         }
         material.setNumber(materialDto.getNumber());
         materialDao.save(material);
+        refreshCache();
         log.info("save material, id: {}, {}", material.getId(), material.getName());
     }
 
-    public List<Material> getAllMaterials() {
-        if (allMaterials.isEmpty()) {
-            allMaterials = materialDao.findAll();
-            log.info("load all materials, count: {}", allMaterials.size());
-        }
-        return allMaterials;
+    private List<Material> getMaterialsFromCache() {
+        return MATERIALS_CACHE.getUnchecked("ANY");
+    }
+
+    private void refreshCache() {
+        MATERIALS_CACHE.refresh("ANY");
     }
 }
