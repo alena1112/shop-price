@@ -39,7 +39,7 @@ public class JewelryController {
     @GetMapping(value = "/all")
     public RestResponse<List<JewelryDto>> loadJewelries() {
         log.info("request to get all jewelries");
-        return RestResponse.withData(getAllJewelries());
+        return RestResponse.withData(getAllJewelries(), "Jewelries loaded successfully");
     }
 
     @GetMapping(value = "/{id}")
@@ -53,7 +53,7 @@ public class JewelryController {
                     .collect(Collectors.toList())
             );
         }
-        return RestResponse.withData(jewelryDto);
+        return RestResponse.withData(jewelryDto, "Jewelry with materials loaded successfully");
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -74,7 +74,7 @@ public class JewelryController {
                 })
                 .collect(Collectors.toList());
         jewelryMaterialService.saveJewelryMaterials(jewelryMaterialsDto.getJewelryId(), result);
-        return RestResponse.ok();
+        return RestResponse.ok(String.format("Jewelry %s loaded successfully", jewelryMaterialsDto.getJewelryId()));
     }
 
     private List<JewelryDto> getAllJewelries() {

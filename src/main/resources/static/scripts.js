@@ -1,23 +1,21 @@
-function loadMessage(response, message) {
+function parseMessage(response) {
     let text = JSON.parse(response);
     let element = document.getElementById("infoMessage");
     element.innerHTML = "Response from server: "
     if (text.error) {
         element.innerHTML += text.error;
         element.style.color = 'red';
-    } else if (message) {
-        element.innerHTML += message;
-        element.style.color = 'green';
     } else {
-        element.innerHTML += text.data;
+        element.innerHTML += text.message;
         element.style.color = 'green';
     }
+    return text;
 }
 
 function loadShops() {
     fetch("http://localhost:8080/shop").then(function (response) {
         response.text().then(function (text) {
-            let json = JSON.parse(text).data;
+            let json = parseMessage(text).data;
             let selectForLoading = document.getElementById("shopSelect");
             let selectForFiltering = document.getElementById("shopFilter");
             addShopOptionsInSelect(selectForLoading, json);
@@ -52,7 +50,7 @@ function getOrders() {
     fetch("http://localhost:8080/material/orders" + shopParam)
         .then(function (response) {
             response.text().then(function (text) {
-                let json = JSON.parse(text).data;
+                let json = parseMessage(text).data;
                 let orderFilter = document.getElementById("materialOrderFilter");
                 while (orderFilter.hasChildNodes()) {
                     orderFilter.removeChild(orderFilter.lastChild);
@@ -72,7 +70,7 @@ function getOrders() {
 }
 
 function render(value) {
-    let json = JSON.parse(value).data;
+    let json = parseMessage(value).data;
     let table = document.getElementById("materialsBody");
     clearTable("materialsBody")
 
@@ -125,7 +123,7 @@ function render(value) {
             fetch("http://localhost:8080/material/" + this.value)
                 .then(function (response) {
                     response.text().then(function (text) {
-                        let material = JSON.parse(text).data;
+                        let material = parseMessage(text).data;
                         addMaterialInJewelryMaterialsTable(material, "1")
                         updateOriginalPrice();
                     })
@@ -169,7 +167,10 @@ function loadMaterials() {
         method: 'POST',
         headers: {'Content-Type': 'application/json'}
     }).then(function (response) {
-        window.location.reload();
+        window.location.reload();//TODO удалить
+        response.text().then(function (text) {
+            parseMessage(text);
+        });
     });
 }
 
@@ -184,7 +185,10 @@ function loadOrderPage() {
             text: pageTextArea.value
         })
     }).then(function (response) {
-        window.location.reload();
+        window.location.reload();//TODO удалить
+        response.text().then(function (text) {
+            parseMessage(text);
+        });
     });
 }
 
@@ -193,7 +197,10 @@ function createMaterial() {
         method: 'POST',
         headers: {'Content-Type': 'application/json'}
     }).then(function (response) {
-        window.location.reload();
+        window.location.reload();//TODO удалить
+        response.text().then(function (text) {
+            parseMessage(text);
+        });
     });
 }
 
@@ -218,7 +225,7 @@ function updateOriginalPrice() {
             })
         }).then(function (response) {
             response.text().then(function (text) {
-                price.innerHTML = JSON.parse(text).data;
+                price.innerHTML = parseMessage(text).data;
             });
         });
     } else {
@@ -243,7 +250,10 @@ function saveMaterial() {
             number: number
         })
     }).then(function (response) {
-        window.location.reload();
+        window.location.reload();//TODO удалить
+        response.text().then(function (text) {
+            parseMessage(text);
+        });
     });
 }
 
@@ -266,8 +276,7 @@ function loadJewelries() {
     fetch("http://localhost:8080/jewelry/all")
         .then(function (response) {
             response.text().then(function (text) {
-                loadMessage(text, "Jewelry loaded successfully")
-                let jewelries = JSON.parse(text).data;
+                let jewelries = parseMessage(text).data;
                 let jewelryList = document.getElementById("jewelryList");
                 for (let i = 0; i < jewelries.length; i++) {
                     let optionElement = document.createElement("option");
@@ -287,7 +296,7 @@ function showJewelry() {
         fetch("http://localhost:8080/jewelry/" + jewelryList.value)
             .then(function (response) {
                 response.text().then(function (text) {
-                    let json = JSON.parse(text).data;
+                    let json = parseMessage(text).data;
                     jewelryImg.src = json.imageUrl;
                     marketPrice.innerHTML = json.price;
 
@@ -329,7 +338,7 @@ function saveJewelry() {
             })
         }).then(function (response) {
             response.text().then(function (text) {
-                loadMessage(text, "Materials saved successfully")
+                parseMessage(text)
             });
         });
     }

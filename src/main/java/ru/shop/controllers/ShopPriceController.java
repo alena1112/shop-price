@@ -22,7 +22,8 @@ public class ShopPriceController {
     public RestResponse<List<ShopDto>> getAllShops() {
         log.info("request to get all shops");
         return RestResponse.withData(
-                Arrays.stream(Shop.values()).map(s -> new ShopDto(s.name(), s.getId())).collect(Collectors.toList())
+                Arrays.stream(Shop.values()).map(s -> new ShopDto(s.name(), s.getId())).collect(Collectors.toList()),
+                "Shops loaded successfully"
         );
     }
 }

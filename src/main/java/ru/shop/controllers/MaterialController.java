@@ -41,28 +41,29 @@ public class MaterialController {
                                 StringUtils.defaultIfBlank(materialName, null))
                         .stream()
                         .map(MaterialDto::toMaterialDto)
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toList()), "Materials loaded successfully");
     }
 
     @PostMapping
     public RestResponse<?> saveMaterial(@RequestBody MaterialDto materialDto) {
         log.info("request to save material");
         materialService.saveMaterial(materialDto);
-        return RestResponse.ok();
+        return RestResponse.ok("Material saved successfully");
     }
 
     @GetMapping("/{id}")
     public RestResponse<MaterialDto> getMaterial(@PathVariable("id") String materialId) {
         log.info("request to get a material by id {}", materialId);
         return RestResponse.withData(
-                materialService.getMaterialById(Long.parseLong(materialId)).map(MaterialDto::toMaterialDto).orElse(null));
+                materialService.getMaterialById(Long.parseLong(materialId)).map(MaterialDto::toMaterialDto).orElse(null),
+                "Material loaded successfully");
     }
 
     @PostMapping(value = "/load")
     public RestResponse<?> loadMaterials() {
         log.info("request to start loading materials");
         materialOrderService.loadMaterials();
-        return RestResponse.ok();
+        return RestResponse.ok("Materials loaded successfully");
     }
 
     @PostMapping(value = "/loadPage")
@@ -71,18 +72,18 @@ public class MaterialController {
         SPException.checkNotNull(pageDto.getShop(), "Shop is null!");
         SPException.checkNotEmpty(pageDto.getText(), "Page text is null!");
         materialOrderService.loadMaterials(pageDto.getShop(), pageDto.getText());
-        return RestResponse.ok();
+        return RestResponse.ok("Shop page loaded successfully");
     }
 
     @GetMapping("/orders")
     public RestResponse<List<String>> getOrders(@RequestParam(value = "shop", required = false) Shop shop) {
         log.info("request to get all material orders");
-        return RestResponse.withData(materialOrderService.getOrders(shop));
+        return RestResponse.withData(materialOrderService.getOrders(shop), "Material Orders loaded successfully");
     }
 
     @PostMapping(value = "/calculate")
     public RestResponse<Double> calculatePrice(@RequestBody JewelryMaterialsDto jewelryMaterialsDto) {
         log.info("request to start calculating price");
-        return RestResponse.withData(materialService.calculatePrice(jewelryMaterialsDto));
+        return RestResponse.withData(materialService.calculatePrice(jewelryMaterialsDto), "Original price calculated successfully");
     }
 }
