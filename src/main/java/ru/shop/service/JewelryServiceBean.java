@@ -3,7 +3,6 @@ package ru.shop.service;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -15,22 +14,22 @@ import ru.shop.JewelryShopProperties;
 import ru.shop.SPException;
 import ru.shop.controllers.dto.JewelryDto;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
-@RequiredArgsConstructor
 public class JewelryServiceBean implements JewelryService {
     private static final Logger log = LoggerFactory.getLogger(JewelryServiceBean.class);
 
     private final RestTemplate restTemplate;
     private final JewelryShopProperties jewelryShopProperties;
 
-    private LoadingCache<String, List<JewelryDto>> JEWELRIES_CACHE;
+    private final LoadingCache<String, List<JewelryDto>> JEWELRIES_CACHE;
 
-    @PostConstruct
-    public void initCache() {
+    public JewelryServiceBean(RestTemplate restTemplate, JewelryShopProperties jewelryShopProperties) {
+        this.restTemplate = restTemplate;
+        this.jewelryShopProperties = jewelryShopProperties;
+
         JEWELRIES_CACHE = CacheBuilder
                 .newBuilder()
                 .expireAfterAccess(5, TimeUnit.MINUTES)

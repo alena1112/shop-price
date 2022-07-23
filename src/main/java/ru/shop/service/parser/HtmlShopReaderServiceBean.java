@@ -3,6 +3,7 @@ package ru.shop.service.parser;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.util.StringUtils;
 import ru.shop.model.Material;
 import ru.shop.model.MaterialOrder;
 import ru.shop.model.Shop;
@@ -41,7 +42,7 @@ public class HtmlShopReaderServiceBean implements HtmlShopReaderService {
         log.info(String.format("Starting parse file %s", file.getName()));
 
         String result = parseDocument(file);
-        Optional<MaterialOrder> order = parse(result, file.getName(), shop);
+        Optional<MaterialOrder> order = parse(result, StringUtils.stripFilenameExtension(file.getName()), shop);
 
         log.info(String.format("File %s was successfully parsed", file.getName()));
         return order;
@@ -65,7 +66,7 @@ public class HtmlShopReaderServiceBean implements HtmlShopReaderService {
 
         List<Material> items = new ArrayList<>();
         MaterialOrder order = new MaterialOrder();
-        order.setName(orderMaterialName);//TODO удалить расширение файла
+        order.setName(orderMaterialName);
         order.setMaterials(items);
         order.setDeliveryPrice(DeliveryCostParser.parseDelivery(shop).apply(doc));
         order.setShop(shop);

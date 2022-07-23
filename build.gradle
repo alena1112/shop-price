@@ -29,21 +29,24 @@ allprojects {
 dependencies {
     implementation 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-
     implementation("ch.qos.logback:logback-classic")
     implementation("com.google.code.gson:gson")
-
     implementation('org.flywaydb:flyway-core')
     implementation("org.postgresql:postgresql")
-
     implementation("org.jsoup:jsoup:${Versions.jsoup}")
     implementation("org.apache.commons:commons-lang3")
     implementation("com.google.guava:guava:${Versions.guava}")
-
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    testImplementation ('org.junit.jupiter:junit-jupiter-api')
+    testImplementation ('org.junit.jupiter:junit-jupiter-engine')
+    testImplementation ('org.junit.jupiter:junit-jupiter-params')
+    testImplementation ('org.assertj:assertj-core')
+    testImplementation ('org.mockito:mockito-core')
+    testImplementation ('org.mockito:mockito-junit-jupiter')
 }
 
 test {

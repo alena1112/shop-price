@@ -40,7 +40,9 @@ public class LineParser {
                 numberInPackage = Integer.parseInt(m.group(4));
             }
         } else {
-            throw new RegexPatternNotCorrectException(pattern.toString(), Shop.GREEN_BIRD.getId(), tags.get(1).text());
+            log.error("Pattern {} is not correct for shop {}, line: {}", pattern, Shop.GREEN_BIRD.getId(), tags.get(1).text());
+            name = tags.get(1).text();
+//            throw new RegexPatternNotCorrectException(pattern.toString(), Shop.GREEN_BIRD.getId(), tags.get(1).text());
         }
 
         tags.get(0).childNodes().get(1).attributes().get("src");
