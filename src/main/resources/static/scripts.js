@@ -18,8 +18,8 @@ function loadShops() {
             let json = parseMessage(text).data;
             let selectForLoading = document.getElementById("shopSelect");
             let selectForFiltering = document.getElementById("shopFilter");
-            addShopOptionsInSelect(selectForLoading, json);
-            addShopOptionsInSelect(selectForFiltering, json);
+            addShopOptionsInSelect(selectForLoading, json, false);
+            addShopOptionsInSelect(selectForFiltering, json, true);
         })
     });
 }
@@ -167,9 +167,10 @@ function loadMaterials() {
         method: 'POST',
         headers: {'Content-Type': 'application/json'}
     }).then(function (response) {
-        window.location.reload();//TODO удалить
         response.text().then(function (text) {
             parseMessage(text);
+            getAllMaterials(true);
+            loadShops();
         });
     });
 }
@@ -185,9 +186,11 @@ function loadOrderPage() {
             text: pageTextArea.value
         })
     }).then(function (response) {
-        window.location.reload();//TODO удалить
         response.text().then(function (text) {
             parseMessage(text);
+            getAllMaterials(true);
+            loadShops();
+            closeOrderPageDialog();
         });
     });
 }
@@ -197,14 +200,26 @@ function loadOrderPage() {
 //         method: 'POST',
 //         headers: {'Content-Type': 'application/json'}
 //     }).then(function (response) {
-//         window.location.reload();
 //         response.text().then(function (text) {
 //             parseMessage(text);
 //         });
 //     });
 // }
 
-function addShopOptionsInSelect(select, shops) {
+function addShopOptionsInSelect(select, shops, isExistEmptyOption) {
+    while (select.hasChildNodes()) {
+        select.removeChild(select.lastChild);
+    }
+    if (isExistEmptyOption) {
+        let optionElement = document.createElement("option");
+        optionElement.innerHTML = 'ALL';
+        select.appendChild(optionElement);
+    }
+    for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].value !== 'ALL') {
+            select.remove(i);
+        }
+    }
     for (let i = 0; i < shops.length; i++) {
         let optionElement = document.createElement("option");
         optionElement.value = shops[i].value;
@@ -250,9 +265,11 @@ function saveMaterial() {
             number: number
         })
     }).then(function (response) {
-        window.location.reload();//TODO удалить
         response.text().then(function (text) {
             parseMessage(text);
+            getAllMaterials(true);
+            loadShops();
+            closeMaterialDialog();
         });
     });
 }
