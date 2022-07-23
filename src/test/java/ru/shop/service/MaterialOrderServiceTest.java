@@ -27,6 +27,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class MaterialOrderServiceTest {
     @Mock
+    private MaterialService materialService;
+    @Mock
     private MaterialOrderDao materialOrderDao;
     @Mock
     private HtmlShopReaderService greenBirdParser;
@@ -67,6 +69,7 @@ public class MaterialOrderServiceTest {
 
         service.loadMaterials();
 
+        verify(materialService).refreshMaterialCache();
         verify(materialOrderDao).saveAll(materialOrdersCaptor.capture());
         List<MaterialOrder> value = materialOrdersCaptor.getValue();
         assertFalse(value.isEmpty());
@@ -84,6 +87,7 @@ public class MaterialOrderServiceTest {
 
         service.loadMaterials(shop, pageText);
 
+        verify(materialService).refreshMaterialCache();
         verify(materialOrderDao).save(materialOrderCaptor.capture());
         MaterialOrder value = materialOrderCaptor.getValue();
         assertNotNull(value);

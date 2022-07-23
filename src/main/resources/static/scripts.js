@@ -192,17 +192,17 @@ function loadOrderPage() {
     });
 }
 
-function createMaterial() {
-    fetch('http://localhost:8080/material', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'}
-    }).then(function (response) {
-        window.location.reload();//TODO удалить
-        response.text().then(function (text) {
-            parseMessage(text);
-        });
-    });
-}
+// function createMaterial() {//TODO сделать реализацию
+//     fetch('http://localhost:8080/material', {
+//         method: 'POST',
+//         headers: {'Content-Type': 'application/json'}
+//     }).then(function (response) {
+//         window.location.reload();
+//         response.text().then(function (text) {
+//             parseMessage(text);
+//         });
+//     });
+// }
 
 function addShopOptionsInSelect(select, shops) {
     for (let i = 0; i < shops.length; i++) {

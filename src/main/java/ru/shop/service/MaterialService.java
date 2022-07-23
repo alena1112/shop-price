@@ -13,4 +13,5 @@ public interface MaterialService {
     Optional<Material> getMaterialById(Long id);
     double calculatePrice(JewelryMaterialsDto jewelryMaterialsDto);
     void saveMaterial(MaterialDto materialDto);
+    void refreshMaterialCache();
 }

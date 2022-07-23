@@ -100,6 +100,12 @@ public class MaterialServiceTest {
         verify(materialDao).save(any(Material.class));
     }
 
+    @Test
+    public void refreshMaterialCacheTest() {
+        when(materialDao.findAll()).thenReturn(List.of(new Material()));
+        service.refreshMaterialCache();
+    }
+
     private Material createMaterial(Shop shop, String materialOrderName, String materialName) {
         return createMaterial(1L, shop, materialOrderName, materialName, 0.0, 0.0, 1);
     }

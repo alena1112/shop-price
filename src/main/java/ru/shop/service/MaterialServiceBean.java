@@ -94,6 +94,11 @@ public class MaterialServiceBean implements MaterialService {
         log.info("save material, id: {}, {}", material.getId(), material.getName());
     }
 
+    @Override
+    public void refreshMaterialCache() {
+        refreshCache();
+    }
+
     private List<Material> getMaterialsFromCache() {
         return MATERIALS_CACHE.getUnchecked("ANY");
     }

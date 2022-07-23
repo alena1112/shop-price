@@ -29,6 +29,8 @@ public class MaterialOrderServiceBean implements MaterialOrderService {
     private static final Logger log = LoggerFactory.getLogger(MaterialOrderServiceBean.class);
 
     @Autowired
+    private MaterialService materialService;
+    @Autowired
     private MaterialOrderDao materialOrderDao;
     @Autowired
     private HtmlShopReaderService greenBirdParser;
@@ -85,6 +87,7 @@ public class MaterialOrderServiceBean implements MaterialOrderService {
         });
         materialOrderDao.saveAll(materialOrders);
         refreshAllCache();
+        materialService.refreshMaterialCache();
         log.info("load material orders count: {}", materialOrders.size());
     }
 
@@ -95,6 +98,7 @@ public class MaterialOrderServiceBean implements MaterialOrderService {
             calculatePriceForEachMaterial(o);
             materialOrderDao.save(o);
             refreshCache(o.getShop());
+            materialService.refreshMaterialCache();
             log.info("load material order page {}", o.getName());
         });
     }
