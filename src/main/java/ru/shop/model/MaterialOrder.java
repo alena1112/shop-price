@@ -17,7 +17,7 @@ import java.util.List;
 public class MaterialOrder extends IdentifiableEntity {
     private static SimpleDateFormat FORMAT_DATE = new SimpleDateFormat("dd.MM.yyyy");
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
@@ -27,7 +27,7 @@ public class MaterialOrder extends IdentifiableEntity {
     private double deliveryPrice;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "shop")
+    @Column(name = "shop", nullable = false)
     private Shop shop;
 
     @Column(name = "purchase_date")

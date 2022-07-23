@@ -30,7 +30,7 @@ public class Material extends IdentifiableEntity {
     private String imageURL;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "material_order_id")
+    @JoinColumn(name = "material_order_id", nullable = false)
     private MaterialOrder order;
 
     public Material(Long id) {

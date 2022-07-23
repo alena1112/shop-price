@@ -20,8 +20,6 @@ allprojects {
             imports {
                 mavenBom("org.springframework.boot:spring-boot-dependencies:2.5.2")
             }
-            dependency("org.testcontainers:junit-jupiter:${Versions.testcontainers}")
-            dependency("org.testcontainers:postgresql:${Versions.testcontainers}")
         }
     }
 }
@@ -41,12 +39,15 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
+    implementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation ('org.junit.jupiter:junit-jupiter-api')
     testImplementation ('org.junit.jupiter:junit-jupiter-engine')
     testImplementation ('org.junit.jupiter:junit-jupiter-params')
     testImplementation ('org.assertj:assertj-core')
     testImplementation ('org.mockito:mockito-core')
     testImplementation ('org.mockito:mockito-junit-jupiter')
+    testImplementation("org.testcontainers:junit-jupiter:${Versions.testcontainers}")
+    testImplementation("org.testcontainers:postgresql:${Versions.testcontainers}")
 }
 
 test {
