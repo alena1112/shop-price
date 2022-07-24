@@ -1,6 +1,5 @@
 package ru.shop.service;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,9 +8,6 @@ import ru.shop.model.MaterialOrder;
 import ru.shop.model.Shop;
 import ru.shop.service.parser.HtmlShopReaderService;
 import ru.shop.service.parser.HtmlShopReaderServiceBean;
-
-import java.io.File;
-import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -35,13 +31,10 @@ public class HtmlShopReaderServiceTest {
             new HtmlShopReaderServiceBean("utf-8", "table", "id", "purchases", "tr", "td", 5);
 
     @Test
-    @SneakyThrows
-    public void greenBirdParseTest() throws Exception {
+    public void greenBirdParseTest() {
         final Shop shop = Shop.GREEN_BIRD;
-        URL resource = HtmlShopReaderServiceTest.class.getResource("/orders/" + shop.getId());
-        File[] files = new File(resource.toURI()).listFiles();
 
-        MaterialOrder actual = greenBirdService.parse(files[0], shop).orElse(null);
+        MaterialOrder actual = greenBirdService.parseFile("greenBird_16.01.2019.html", shop).orElse(null);
 
         assertNotNull(actual);
         assertEquals("greenBird_16.01.2019", actual.getName());
@@ -51,13 +44,10 @@ public class HtmlShopReaderServiceTest {
     }
 
     @Test
-    @SneakyThrows
-    public void luxfurnituraParseTest() throws Exception {
+    public void luxfurnituraParseTest() {
         final Shop shop = Shop.LUXFURNITURA;
-        URL resource = HtmlShopReaderServiceTest.class.getResource("/orders/" + shop.getId());
-        File[] files = new File(resource.toURI()).listFiles();
 
-        MaterialOrder actual = luxfurnituraService.parse(files[0], shop).orElse(null);
+        MaterialOrder actual = luxfurnituraService.parseFile("luxfurnitura_14.06.2022.html", shop).orElse(null);
 
         assertNotNull(actual);
         assertEquals("luxfurnitura_14.06.2022", actual.getName());
@@ -67,13 +57,10 @@ public class HtmlShopReaderServiceTest {
     }
 
     @Test
-    @SneakyThrows
-    public void pandahallParseTest() throws Exception {
+    public void pandahallParseTest() {
         final Shop shop = Shop.PANDAHALL;
-        URL resource = HtmlShopReaderServiceTest.class.getResource("/orders/" + shop.getId());
-        File[] files = new File(resource.toURI()).listFiles();
 
-        MaterialOrder actual = pandahallService.parse(files[0], shop).orElse(null);
+        MaterialOrder actual = pandahallService.parseFile("pandahall_23.02.2019.html", shop).orElse(null);
 
         assertNotNull(actual);
         assertEquals("pandahall_23.02.2019", actual.getName());
@@ -83,13 +70,10 @@ public class HtmlShopReaderServiceTest {
     }
 
     @Test
-    @SneakyThrows
-    public void stilnayaParseTest() throws Exception {
+    public void stilnayaParseTest() {
         final Shop shop = Shop.STILNAYA;
-        URL resource = HtmlShopReaderServiceTest.class.getResource("/orders/" + shop.getId());
-        File[] files = new File(resource.toURI()).listFiles();
 
-        MaterialOrder actual = pandahallService.parse(files[0], shop).orElse(null);
+        MaterialOrder actual = pandahallService.parseFile("stilnaya_27.01.2019.html", shop).orElse(null);
 
         assertNotNull(actual);
         assertEquals("stilnaya_27.01.2019", actual.getName());

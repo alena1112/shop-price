@@ -14,9 +14,8 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -38,18 +37,18 @@ public class HtmlShopReaderServiceBean implements HtmlShopReaderService {
     private final int columnSize;
 
     @Override
-    public Optional<MaterialOrder> parse(File file, Shop shop) {
-        log.info(String.format("Starting parse file %s", file.getName()));
+    public Optional<MaterialOrder> parseFile(String fileName, Shop shop) {
+        log.info(String.format("Starting parse file %s", fileName));
 
-        String result = parseDocument(file);
-        Optional<MaterialOrder> order = parse(result, StringUtils.stripFilenameExtension(file.getName()), shop);
+        String result = parseDocument(fileName, shop);
+        Optional<MaterialOrder> order = parse(result, StringUtils.stripFilenameExtension(fileName), shop);
 
-        log.info(String.format("File %s was successfully parsed", file.getName()));
+        log.info(String.format("File %s was successfully parsed", fileName));
         return order;
     }
 
     @Override
-    public Optional<MaterialOrder> parse(String text, Shop shop) {
+    public Optional<MaterialOrder> parseText(String text, Shop shop) {
         String materialOrderName = shop.getId() + "_" + UUID.randomUUID();
         log.info(String.format("Starting parse text %s", materialOrderName));
 
@@ -98,14 +97,19 @@ public class HtmlShopReaderServiceBean implements HtmlShopReaderService {
         return Optional.of(order);
     }
 
-    private String parseDocument(File file) {
+    private String parseDocument(String fileName, Shop shop) {
         StringBuilder result = new StringBuilder();
-        try (Scanner in = new Scanner(new FileInputStream(file), charsetName)) {
-            while (in.hasNextLine()) {
-                result.append(in.nextLine()).append("\n");
+        InputStream inputStream = getClass().getResourceAsStream("/orders/" + shop.getId() + "/" + fileName);
+        if (inputStream != null) {
+            try (InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+                 BufferedReader reader = new BufferedReader(streamReader)) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+            } catch (IOException e) {
+                log.error(String.format("Error while parsing file %s", fileName), e);
             }
-        } catch (IOException e) {
-            log.error(String.format("Error while parsing file %s", file.getName()), e);
         }
         return result.toString();
     }

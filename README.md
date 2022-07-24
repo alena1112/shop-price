@@ -38,10 +38,10 @@
 4. sh docker-build.sh build latest
 5. sh docker-build.sh push latest
 6. docker-compose up -d --build
-7. Остановить и удалить контейнеры: docker-compose down
+7. Остановить и удалить контейнеры: docker-compose stop/down
 
 ##Посмотреть логи: 
-1. docker exec -ti docker_shop-price-service_1 /bin/sh
+1. docker exec -ti  /bin/sh
 2. tail -f shop_price.log
 
 ##Будущие фичи:

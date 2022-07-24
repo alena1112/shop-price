@@ -13,6 +13,7 @@ import ru.shop.model.Shop;
 import ru.shop.service.MaterialOrderService;
 import ru.shop.service.MaterialService;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,7 +60,7 @@ public class MaterialController {
     }
 
     @PostMapping(value = "/load")
-    public RestResponse<?> loadMaterials() {
+    public RestResponse<?> loadMaterials() throws IOException {
         log.info("request to start loading materials");
         materialOrderService.loadMaterials();
         return RestResponse.ok("Materials loaded successfully");

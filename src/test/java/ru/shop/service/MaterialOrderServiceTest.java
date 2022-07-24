@@ -1,5 +1,6 @@
 package ru.shop.service;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +15,6 @@ import ru.shop.model.MaterialOrder;
 import ru.shop.model.Shop;
 import ru.shop.service.parser.HtmlShopReaderService;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -52,17 +52,18 @@ public class MaterialOrderServiceTest {
     }
 
     @Test
-    public void loadMaterialsTest() {
+    @SneakyThrows
+    public void loadMaterialsTest() throws Exception {
         MaterialOrder luxfurnituraMO = createMaterialOrder("luxfurnitura_14.06.2022", Shop.LUXFURNITURA);
         MaterialOrder greenBirdMO = createMaterialOrder("greenBird_09.04.2019", Shop.GREEN_BIRD);
         MaterialOrder pandahallMO = createMaterialOrder("pandahall_23.02.2019.html", Shop.PANDAHALL);
         MaterialOrder stilnayaMO = createMaterialOrder("stilnaya_16.04.2019.html", Shop.STILNAYA);
 
         when(materialOrderDao.existsMaterialOrderByName(any(String.class))).thenReturn(false);
-        when(greenBirdParser.parse(any(File.class), eq(Shop.GREEN_BIRD))).thenReturn(Optional.of(greenBirdMO));
-        when(pandahallParser.parse(any(File.class), eq(Shop.PANDAHALL))).thenReturn(Optional.of(pandahallMO));
-        when(stilnayaParser.parse(any(File.class), eq(Shop.STILNAYA))).thenReturn(Optional.of(stilnayaMO));
-        when(luxfurnituraParser.parse(any(File.class), eq(Shop.LUXFURNITURA))).thenReturn(Optional.of(luxfurnituraMO));
+        when(greenBirdParser.parseFile(any(String.class), eq(Shop.GREEN_BIRD))).thenReturn(Optional.of(greenBirdMO));
+        when(pandahallParser.parseFile(any(String.class), eq(Shop.PANDAHALL))).thenReturn(Optional.of(pandahallMO));
+        when(stilnayaParser.parseFile(any(String.class), eq(Shop.STILNAYA))).thenReturn(Optional.of(stilnayaMO));
+        when(luxfurnituraParser.parseFile(any(String.class), eq(Shop.LUXFURNITURA))).thenReturn(Optional.of(luxfurnituraMO));
         for (Shop s : Shop.values()) {
             when(materialOrderDao.getAllOrderNames(s)).thenReturn(new ArrayList<>());
         }
@@ -82,7 +83,7 @@ public class MaterialOrderServiceTest {
         final Shop shop = Shop.LUXFURNITURA;
         final MaterialOrder luxfurnituraMO = createMaterialOrder("luxfurnitura", shop);
 
-        when(luxfurnituraParser.parse(pageText, shop)).thenReturn(Optional.of(luxfurnituraMO));
+        when(luxfurnituraParser.parseText(pageText, shop)).thenReturn(Optional.of(luxfurnituraMO));
         when(materialOrderDao.getAllOrderNames(shop)).thenReturn(new ArrayList<>());
 
         service.loadMaterials(shop, pageText);

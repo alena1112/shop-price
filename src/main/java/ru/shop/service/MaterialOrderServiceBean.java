@@ -15,13 +15,17 @@ import ru.shop.model.MaterialOrder;
 import ru.shop.model.Shop;
 import ru.shop.service.parser.HtmlShopReaderService;
 
-import java.io.File;
-import java.net.URL;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -59,41 +63,36 @@ public class MaterialOrderServiceBean implements MaterialOrderService {
     }
 
     @Override
-    public void loadMaterials() {
+    public void loadMaterials() throws IOException {
         List<MaterialOrder> materialOrders = new ArrayList<>();
-        Arrays.stream(Shop.values()).forEach(shop -> {
-            try {
-                URL resource = MaterialServiceBean.class.getResource("/orders/" + shop.getId());
-                if (resource != null) {
-                    File[] files = new File(resource.toURI()).listFiles();
-                    if (files != null) {
-                        Arrays.stream(files).forEach(file -> {
-                            boolean isExist = materialOrderDao.existsMaterialOrderByName(StringUtils.stripFilenameExtension(file.getName()));
-                            if (!isExist) {
-                                Optional<MaterialOrder> order = getShopReaderService(shop).parse(file, shop);
-                                order.ifPresent(o -> {
-                                    calculatePriceForEachMaterial(o);
-                                    materialOrders.add(o);
-                                });
-                            } else {
-                                log.warn("Material Order {} already loaded", file.getName());
-                            }
+        for (Shop shop : Shop.values()) {
+            List<String> fileNames = loadFileNames(shop);
+            if (!fileNames.isEmpty()) {
+                for (String fileName : fileNames) {
+                    boolean isExist = materialOrderDao.existsMaterialOrderByName(StringUtils.stripFilenameExtension(fileName));
+                    if (!isExist) {
+                        Optional<MaterialOrder> order = getShopReaderService(shop).parseFile(fileName, shop);
+                        order.ifPresent(o -> {
+                            calculatePriceForEachMaterial(o);
+                            materialOrders.add(o);
                         });
+                    } else {
+                        log.warn("Material Order {} already loaded", fileName);
                     }
                 }
-            } catch (Exception e) {
-                log.error(e.getMessage());
             }
-        });
-        materialOrderDao.saveAll(materialOrders);
-        refreshAllCache();
-        materialService.refreshMaterialCache();
-        log.info("load material orders count: {}", materialOrders.size());
+        }
+        if (!materialOrders.isEmpty()) {
+            materialOrderDao.saveAll(materialOrders);
+            refreshAllCache();
+            materialService.refreshMaterialCache();
+            log.info("load material orders count: {}", materialOrders.size());
+        }
     }
 
     @Override
     public void loadMaterials(Shop shop, String pageText) {
-        Optional<MaterialOrder> order = getShopReaderService(shop).parse(pageText, shop);
+        Optional<MaterialOrder> order = getShopReaderService(shop).parseText(pageText, shop);
         order.ifPresent(o -> {
             calculatePriceForEachMaterial(o);
             materialOrderDao.save(o);
@@ -110,13 +109,34 @@ public class MaterialOrderServiceBean implements MaterialOrderService {
         return orderNames;
     }
 
+    private List<String> loadFileNames(Shop shop) throws IOException {
+        List<String> fileNames = new ArrayList<>();
+        //this file_names only for docker!
+        InputStream inputStream = getClass().getResourceAsStream("/orders/" + shop.getId() + "/file_names.txt");
+        if (inputStream != null) {
+            try (InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+                 BufferedReader reader = new BufferedReader(streamReader)) {
+                List<String> found = reader.lines().collect(Collectors.toList());
+                if (found.isEmpty()) {
+                    log.warn("Could not find files for shop {}", shop.getId());
+                } else {
+                    fileNames = found;
+                    log.info("Found files {}", String.join(", ", fileNames));
+                }
+            }
+        } else {
+            log.warn("Could not find files for shop {}", shop.getId());
+        }
+        return fileNames;
+    }
+
     private HtmlShopReaderService getShopReaderService(Shop shop) {
         return switch (shop) {
             case GREEN_BIRD -> greenBirdParser;
             case PANDAHALL -> pandahallParser;
             case STILNAYA -> stilnayaParser;
             case LUXFURNITURA -> luxfurnituraParser;
-            default -> (f, s) -> Optional.empty();
+            default -> (fileName, s) -> Optional.empty();
         };
     }
 
