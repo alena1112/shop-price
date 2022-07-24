@@ -1,3 +1,5 @@
+version: "3"
+
 services:
   shop-price-db:
     image: postgres:12
