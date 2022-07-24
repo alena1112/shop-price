@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  shop-price-db:
+    image: postgres:12
+    ports:
+      - 5430:5432
+    environment:
+      - POSTGRES_DB=shopPriceDB
+      - POSTGRES_USER=usr
+      - POSTGRES_PASSWORD=pwd
+
+  shop-price-service:
+    image: alena1112/shop-price-service
+    ports:
+      - 8080:8080
