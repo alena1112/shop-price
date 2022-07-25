@@ -1,3 +1,6 @@
+// let address = "http://185.46.8.125:8080";
+let address = "http://localhost:8080";
+
 function parseMessage(response) {
     let text = JSON.parse(response);
     let element = document.getElementById("infoMessage");
@@ -13,7 +16,7 @@ function parseMessage(response) {
 }
 
 function loadShops() {
-    fetch("http://localhost:8080/shop").then(function (response) {
+    fetch(address + "/shop").then(function (response) {
         response.text().then(function (text) {
             let json = parseMessage(text).data;
             let selectForLoading = document.getElementById("shopSelect");
@@ -32,7 +35,7 @@ function getAllMaterials(isUpdateOrderFilter) {
     let params = "?shop=" + (shopFilter !== null && shopFilter.value !== 'ALL' ? shopFilter.value : "");
     params += "&order=" + (orderFilter !== null && orderFilter.value !== 'ALL' ? orderFilter.value : "");
     params += "&material=" + (nameFilter !== null ? nameFilter.value : "");
-    fetch("http://localhost:8080/material" + params)
+    fetch(address + "/material" + params)
         .then(function (response) {
             response.text().then(function (text) {
                 render(text);
@@ -47,7 +50,7 @@ function getAllMaterials(isUpdateOrderFilter) {
 function getOrders() {
     let shopFilter = document.getElementById('shopFilter');
     let shopParam = shopFilter !== null && shopFilter.value !== 'ALL' ? "?shop=" + shopFilter.value : "";
-    fetch("http://localhost:8080/material/orders" + shopParam)
+    fetch(address + "/material/orders" + shopParam)
         .then(function (response) {
             response.text().then(function (text) {
                 let json = parseMessage(text).data;
@@ -120,7 +123,7 @@ function render(value) {
         addButton.innerHTML = "Add";
         addButton.value = material.id;
         addButton.onclick = function () {
-            fetch("http://localhost:8080/material/" + this.value)
+            fetch(address + "/material/" + this.value)
                 .then(function (response) {
                     response.text().then(function (text) {
                         let material = parseMessage(text).data;
@@ -163,7 +166,7 @@ function addMaterialInJewelryMaterialsTable(material, count) {
 }
 
 function loadMaterials() {
-    fetch('http://localhost:8080/material/load', {
+    fetch(address + "/material/load", {
         method: 'POST',
         headers: {'Content-Type': 'application/json'}
     }).then(function (response) {
@@ -178,7 +181,7 @@ function loadMaterials() {
 function loadOrderPage() {
     const pageTextArea = document.getElementById('pageTextArea');
     const shopSelect = document.getElementById('shopSelect');
-    fetch('http://localhost:8080/material/loadPage', {
+    fetch(address + "/material/loadPage", {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
@@ -232,7 +235,7 @@ function updateOriginalPrice() {
     let array = readMaterialsTable();
     let price = document.getElementById('originalPrice');
     if (array.length > 0) {
-        fetch('http://localhost:8080/material/calculate', {
+        fetch(address + "/material/calculate", {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -254,7 +257,7 @@ function saveMaterial() {
     let name = document.getElementById('name').value;
     let price = document.getElementById('price').value;
     let number = document.getElementById('number').value;
-    fetch('http://localhost:8080/material', {
+    fetch(address + "/material", {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
@@ -290,7 +293,7 @@ function closeOrderPageDialog() {
 }
 
 function loadJewelries() {
-    fetch("http://localhost:8080/jewelry/all")
+    fetch(address + "/jewelry/all")
         .then(function (response) {
             response.text().then(function (text) {
                 let jewelries = parseMessage(text).data;
@@ -310,7 +313,7 @@ function showJewelry() {
     let jewelryImg = document.getElementById("jewelryImg");
     let marketPrice = document.getElementById("marketPrice");
     if (jewelryList.value) {
-        fetch("http://localhost:8080/jewelry/" + jewelryList.value)
+        fetch(address + "/jewelry/" + jewelryList.value)
             .then(function (response) {
                 response.text().then(function (text) {
                     let json = parseMessage(text).data;
@@ -346,7 +349,7 @@ function saveJewelry() {
     let jewelryId = document.getElementById("jewelryList").value;
     let array = readMaterialsTable();
     if (jewelryId) {
-        fetch('http://localhost:8080/jewelry', {
+        fetch(address + "/jewelry", {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
