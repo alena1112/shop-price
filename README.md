@@ -25,14 +25,19 @@
 7. Docker
 
 ##Сборка и запуск:
-1. gradle clean build
+1. ./gradlew clean build -x test
 2. run ShopPriceApplication.java
 
 ##Тесты:
-1. gradle test
+1. ./gradlew test
 
 ##Через докер:
-1. Проверить application.yml: spring.datasource.url = jdbc:postgresql://host.docker.internal:5430/shopPriceDB
+1. Проверить application.yml/scripts.js:
+
+`spring.datasource.url = jdbc:postgresql://host.docker.internal:5430/shopPriceDB`
+
+`let address = "http://185.46.8.125:8080"`
+
 2. gradle clean build
 3. docker login -u alena1112
 4. sh docker-build.sh build latest
@@ -43,7 +48,8 @@
 ##Посмотреть логи: 
 1. docker exec -ti shop-price_shop-price-service_1 /bin/sh
 2. tail -f shop_price.log
+3. Или docker container logs shop-price_shop-price-service_1
 
 ##Будущие фичи:
-1. Добавить еще один способ загрузки материалов - через запросы
-2. Кеш через redis
+1. Кеш через redis
+2. **Блок с рекомендательным подбором материалов для украшений: построение рекомендаций по типу украшения, описанию, поиск по материалам**
