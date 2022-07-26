@@ -28,9 +28,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
-public class MaterialOrderServiceBean implements MaterialOrderService {
-    private static final Logger log = LoggerFactory.getLogger(MaterialOrderServiceBean.class);
+public class MaterialOrderServiceImpl implements MaterialOrderService {
+    private static final Logger log = LoggerFactory.getLogger(MaterialOrderServiceImpl.class);
 
     @Autowired
     private MaterialService materialService;
@@ -47,7 +46,7 @@ public class MaterialOrderServiceBean implements MaterialOrderService {
 
     private final LoadingCache<Shop, List<String>> MATERIAL_ORDERS_CACHE;
 
-    public MaterialOrderServiceBean() {
+    public MaterialOrderServiceImpl() {
         MATERIAL_ORDERS_CACHE = CacheBuilder
                 .newBuilder()
                 .expireAfterWrite(60, TimeUnit.SECONDS)
@@ -62,6 +61,7 @@ public class MaterialOrderServiceBean implements MaterialOrderService {
                 });
     }
 
+    @Transactional
     @Override
     public void loadMaterials() throws IOException {
         List<MaterialOrder> materialOrders = new ArrayList<>();
@@ -90,6 +90,7 @@ public class MaterialOrderServiceBean implements MaterialOrderService {
         }
     }
 
+    @Transactional
     @Override
     public void loadMaterials(Shop shop, String pageText) {
         Optional<MaterialOrder> order = getShopReaderService(shop).parseText(pageText, shop);
@@ -102,6 +103,7 @@ public class MaterialOrderServiceBean implements MaterialOrderService {
         });
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<String> getOrders(Shop shop) {
         List<String> orderNames = getOrdersFromCache(shop);

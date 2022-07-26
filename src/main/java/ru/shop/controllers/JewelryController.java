@@ -10,6 +10,7 @@ import ru.shop.controllers.dto.JewelryDto;
 import ru.shop.controllers.dto.JewelryMaterialDto;
 import ru.shop.controllers.dto.JewelryMaterialsDto;
 import ru.shop.model.JewelryMaterial;
+import ru.shop.model.JewelryMaterialId;
 import ru.shop.model.Material;
 import ru.shop.service.JewelryMaterialService;
 import ru.shop.service.JewelryService;
@@ -29,7 +30,7 @@ public class JewelryController {
     private final JewelryMaterialService jewelryMaterialService;
     private final JewelryService jewelryService;
 
-    @GetMapping(value = "/all")
+    @GetMapping
     public RestResponse<List<JewelryDto>> loadJewelries() {
         log.info("request to get all jewelries");
         return RestResponse.withData(jewelryService.getAllJewelries(), "Jewelries loaded successfully");
@@ -41,10 +42,11 @@ public class JewelryController {
         JewelryDto jewelryDto = jewelryService.getAllJewelries().stream().filter(j -> j.getId().equals(jewelryId)).findFirst().orElse(null);
         if (jewelryDto != null) {
             jewelryDto.setMaterials(jewelryMaterialService.getMaterialsByJewelryId(jewelryId)
-                    .stream().map(m -> new JewelryMaterialDto(m.getMaterialId(), m.getNumber(),
-                            m.getMaterial().getImageURL(), m.getMaterial().getName()))
-                    .collect(Collectors.toList())
-            );
+                    .stream().map(m -> {
+                        Material material = m.getJewelryMaterialId().getMaterial();
+                        return new JewelryMaterialDto(material.getId(), m.getNumber(),
+                                material.getImageURL(), material.getName());
+                    }).collect(Collectors.toList()));
         }
         return RestResponse.withData(jewelryDto, "Jewelry with materials loaded successfully");
     }
@@ -60,9 +62,7 @@ public class JewelryController {
                         throw new SPException("Materials count must be positive number for material %s!");
                     }
                     return new JewelryMaterial(
-                            jewelryMaterialsDto.getJewelryId(),
-                            dto.getId(),
-                            new Material(dto.getId()),
+                            new JewelryMaterialId(jewelryMaterialsDto.getJewelryId(), new Material(dto.getId())),
                             dto.getCount());
                 })
                 .collect(Collectors.toList());

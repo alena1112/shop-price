@@ -11,21 +11,21 @@ import ru.shop.model.JewelryMaterial;
 import java.util.List;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
-public class JewelryMaterialServiceBean implements JewelryMaterialService {
-    private static final Logger log = LoggerFactory.getLogger(JewelryMaterialServiceBean.class);
+public class JewelryMaterialServiceImpl implements JewelryMaterialService {
+    private static final Logger log = LoggerFactory.getLogger(JewelryMaterialServiceImpl.class);
 
     private final JewelryMaterialDao jewelryMaterialDao;
 
+    @Transactional
     @Override
     public void saveJewelryMaterials(Long jewelryId, List<JewelryMaterial> jewelryMaterials) {
-        jewelryMaterialDao.deleteAllByJewelry(jewelryId);
-        jewelryMaterials.forEach(jm -> jewelryMaterialDao.saveJewelryMaterial(jm.getJewelry(),
-                jm.getMaterialId(), jm.getNumber()));
+        jewelryMaterialDao.deleteAllByJewelryMaterialId_Jewelry(jewelryId);
+        jewelryMaterialDao.saveAll(jewelryMaterials);
         log.info("Saved all jewelry materials, jewelry id {}, materials count {}", jewelryId, jewelryMaterials.size());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<JewelryMaterial> getMaterialsByJewelryId(Long jewelryId) {
         List<JewelryMaterial> materials = jewelryMaterialDao.getMaterialsByJewelryId(jewelryId);

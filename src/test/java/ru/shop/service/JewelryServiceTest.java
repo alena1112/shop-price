@@ -19,7 +19,7 @@ public class JewelryServiceTest {
     @Mock
     private JewelryShopProperties jewelryShopProperties;
     @InjectMocks
-    private JewelryServiceBean service;
+    private JewelryServiceImpl service;
 
     @Test
     public void getAllJewelriesTest() {

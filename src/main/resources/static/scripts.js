@@ -1,5 +1,5 @@
-// let address = "http://185.46.8.125:8080";
-let address = "http://localhost:8080";
+let address = "http://185.46.8.125:8080";
+// let address = "http://localhost:8080";
 
 function parseMessage(response) {
     let text = JSON.parse(response);
@@ -293,7 +293,7 @@ function closeOrderPageDialog() {
 }
 
 function loadJewelries() {
-    fetch(address + "/jewelry/all")
+    fetch(address + "/jewelry")
         .then(function (response) {
             response.text().then(function (text) {
                 let jewelries = parseMessage(text).data;

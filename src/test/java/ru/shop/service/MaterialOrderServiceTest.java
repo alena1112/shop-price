@@ -39,7 +39,7 @@ public class MaterialOrderServiceTest {
     @Mock
     private HtmlShopReaderService luxfurnituraParser;
     @InjectMocks
-    private MaterialOrderServiceBean service;
+    private MaterialOrderServiceImpl service;
 
     @Captor
     private ArgumentCaptor<List<MaterialOrder>> materialOrdersCaptor;

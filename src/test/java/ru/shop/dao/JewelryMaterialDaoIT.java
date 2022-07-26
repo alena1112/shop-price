@@ -2,10 +2,7 @@ package ru.shop.dao;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.shop.model.JewelryMaterial;
-import ru.shop.model.Material;
-import ru.shop.model.MaterialOrder;
-import ru.shop.model.Shop;
+import ru.shop.model.*;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -31,13 +28,13 @@ public class JewelryMaterialDaoIT extends DatabaseIntegrationTest {
 
         final long jewelryId = 10L;
 
-        dao.saveJewelryMaterial(jewelryId, material.getId(), 2);
+        dao.save(new JewelryMaterial(new JewelryMaterialId(jewelryId, material), 2));
 
         List<JewelryMaterial> foundJewelry = dao.getMaterialsByJewelryId(jewelryId);
         assertEquals(1, foundJewelry.size());
         assertEquals(2, foundJewelry.get(0).getNumber());
 
-        dao.deleteAllByJewelry(jewelryId);
+        dao.deleteAllByJewelryMaterialId_Jewelry(jewelryId);
 
         foundJewelry = dao.getMaterialsByJewelryId(jewelryId);
         assertEquals(0, foundJewelry.size());

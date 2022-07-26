@@ -9,6 +9,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import ru.shop.JewelryShopProperties;
 import ru.shop.SPException;
@@ -18,15 +19,15 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class JewelryServiceBean implements JewelryService {
-    private static final Logger log = LoggerFactory.getLogger(JewelryServiceBean.class);
+public class JewelryServiceImpl implements JewelryService {
+    private static final Logger log = LoggerFactory.getLogger(JewelryServiceImpl.class);
 
     private final RestTemplate restTemplate;
     private final JewelryShopProperties jewelryShopProperties;
 
     private final LoadingCache<String, List<JewelryDto>> JEWELRIES_CACHE;
 
-    public JewelryServiceBean(RestTemplate restTemplate, JewelryShopProperties jewelryShopProperties) {
+    public JewelryServiceImpl(RestTemplate restTemplate, JewelryShopProperties jewelryShopProperties) {
         this.restTemplate = restTemplate;
         this.jewelryShopProperties = jewelryShopProperties;
 
@@ -42,6 +43,7 @@ public class JewelryServiceBean implements JewelryService {
                 });
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<JewelryDto> getAllJewelries() {
         return JEWELRIES_CACHE.getUnchecked("ANY");

@@ -20,15 +20,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
-public class MaterialServiceBean implements MaterialService {
-    private static final Logger log = LoggerFactory.getLogger(MaterialServiceBean.class);
+public class MaterialServiceImpl implements MaterialService {
+    private static final Logger log = LoggerFactory.getLogger(MaterialServiceImpl.class);
 
     private final MaterialDao materialDao;
 
     private final LoadingCache<String, List<Material>> MATERIALS_CACHE;
 
-    public MaterialServiceBean(MaterialDao materialDao) {
+    public MaterialServiceImpl(MaterialDao materialDao) {
         this.materialDao = materialDao;
 
         MATERIALS_CACHE = CacheBuilder
@@ -45,6 +44,7 @@ public class MaterialServiceBean implements MaterialService {
                 });
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Material> getAllMaterials(Shop shop, String materialOrderName, String materialName) {
         List<Material> filteredMaterials = getMaterialsFromCache().stream()
@@ -58,11 +58,13 @@ public class MaterialServiceBean implements MaterialService {
         return filteredMaterials;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<Material> getMaterialById(Long id) {
         return getMaterialsFromCache().stream().filter(m -> m.getId().equals(id)).findFirst();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public double calculatePrice(JewelryMaterialsDto jewelryMaterialsDto) {
         double price = 0;
@@ -78,6 +80,7 @@ public class MaterialServiceBean implements MaterialService {
         return price;
     }
 
+    @Transactional
     @Override
     public void saveMaterial(MaterialDto materialDto) {
         Material material = materialDto.getId() != null ? getMaterialById(materialDto.getId()).orElse(null) : null;
@@ -94,6 +97,7 @@ public class MaterialServiceBean implements MaterialService {
         log.info("save material, id: {}, {}", material.getId(), material.getName());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public void refreshMaterialCache() {
         refreshCache();

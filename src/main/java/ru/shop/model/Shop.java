@@ -5,7 +5,7 @@ public enum Shop {
     PANDAHALL("pandahall"),
     STILNAYA("stilnaya"),
     LUXFURNITURA("luxfurnitura"),
-    OTHER("other"),//TODO убрать
+    OTHER("other"),
     ;
 
     private final String id;

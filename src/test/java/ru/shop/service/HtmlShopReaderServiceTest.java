@@ -7,7 +7,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.shop.model.MaterialOrder;
 import ru.shop.model.Shop;
 import ru.shop.service.parser.HtmlShopReaderService;
-import ru.shop.service.parser.HtmlShopReaderServiceBean;
+import ru.shop.service.parser.HtmlShopReaderServiceImpl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -16,19 +16,19 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class HtmlShopReaderServiceTest {
     @InjectMocks
     private HtmlShopReaderService greenBirdService =
-            new HtmlShopReaderServiceBean("windows-1251", "table", "class", "visit_history", "tr", "td", 4);
+            new HtmlShopReaderServiceImpl("windows-1251", "table", "class", "visit_history", "tr", "td", 4);
 
     @InjectMocks
     private HtmlShopReaderService pandahallService =
-            new HtmlShopReaderServiceBean("utf-8", "div", "class", "order_list", "ul", "li,img", 11);
+            new HtmlShopReaderServiceImpl("utf-8", "div", "class", "order_list", "ul", "li,img", 11);
 
     @InjectMocks
     private HtmlShopReaderService stilnayaService =
-            new HtmlShopReaderServiceBean("utf-8", "table", "class", "vmbs-order-materials", "tr", "td", 7);
+            new HtmlShopReaderServiceImpl("utf-8", "table", "class", "vmbs-order-materials", "tr", "td", 7);
 
     @InjectMocks
     private HtmlShopReaderService luxfurnituraService =
-            new HtmlShopReaderServiceBean("utf-8", "table", "id", "purchases", "tr", "td", 5);
+            new HtmlShopReaderServiceImpl("utf-8", "table", "id", "purchases", "tr", "td", 5);
 
     @Test
     public void greenBirdParseTest() {

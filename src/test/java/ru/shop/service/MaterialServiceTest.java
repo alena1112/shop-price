@@ -30,7 +30,7 @@ public class MaterialServiceTest {
     @Mock
     private MaterialDao materialDao;
     @InjectMocks
-    private MaterialServiceBean service;
+    private MaterialServiceImpl service;
 
     public static Stream<Arguments> getAllMaterialsParams() {
         return Stream.of(

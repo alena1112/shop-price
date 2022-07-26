@@ -25,8 +25,8 @@ import java.util.regex.Pattern;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class HtmlShopReaderServiceBean implements HtmlShopReaderService {
-    private static final Logger log = LoggerFactory.getLogger(HtmlShopReaderServiceBean.class);
+public class HtmlShopReaderServiceImpl implements HtmlShopReaderService {
+    private static final Logger log = LoggerFactory.getLogger(HtmlShopReaderServiceImpl.class);
 
     private final String charsetName;
     private final String tableTag;
